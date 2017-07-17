@@ -34,6 +34,7 @@ public class EducationEditActivity extends  EditBaseActivity<Education> {
     @Override
     protected void setupUIForCreate() {
         setTitle("New Education");
+
         findViewById(R.id.education_edit_delete).setVisibility(View.GONE);
     }
 

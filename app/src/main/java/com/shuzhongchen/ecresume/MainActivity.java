@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.google.gson.reflect.TypeToken;
 import com.shuzhongchen.ecresume.model.BasicInfo;
 import com.shuzhongchen.ecresume.model.Education;
+import com.shuzhongchen.ecresume.model.Experience;
+import com.shuzhongchen.ecresume.model.Project;
 import com.shuzhongchen.ecresume.util.DateUtils;
 import com.shuzhongchen.ecresume.util.ImageUtils;
 import com.shuzhongchen.ecresume.util.ModelUtils;
@@ -36,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     private BasicInfo basicInfo;
     private List<Education> educations;
-    //private List<Experience> experiences;
-    //private List<Project> projects;
+    private List<Experience> experiences;
+    private List<Project> projects;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,24 @@ public class MainActivity extends AppCompatActivity {
                         updateEducation(education);
                     }
                     break;
+                case REQ_CODE_EDIT_EXPERIENCE:
+                    String experienceId = data.getStringExtra(ExperienceEditActivity.KEY_EXPERIENCE_ID);
+                    if (experienceId != null) {
+                        deleteExperience(experienceId);
+                    } else {
+                        Experience experience = data.getParcelableExtra(ExperienceEditActivity.KEY_EXPERIENCE);
+                        updateExperience(experience);
+                    }
+                    break;
+                case REQ_CODE_EDIT_PROJECT:
+                    String projectId = data.getStringExtra(ProjectEditActivity.KEY_PROJECT_ID);
+                    if (projectId != null) {
+                        deleteProject(projectId);
+                    } else {
+                        Project project = data.getParcelableExtra(ProjectEditActivity.KEY_PROJECT);
+                        updateProject(project);
+                    }
+                    break;
             }
         }
     }
@@ -80,8 +100,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ImageButton addExperienceBtn = (ImageButton) findViewById(R.id.add_experience_btn);
+        addExperienceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ExperienceEditActivity.class);
+                startActivityForResult(intent, REQ_CODE_EDIT_EXPERIENCE);
+            }
+        });
+
+        ImageButton addProjectBtn = (ImageButton) findViewById(R.id.add_project_btn);
+        addProjectBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ProjectEditActivity.class);
+                startActivityForResult(intent, REQ_CODE_EDIT_PROJECT);
+            }
+        });
+
         setupBasicInfo();
         setupEducationsUI();
+        setupExperiencesUI();
+        setupProjectsUI();
     }
 
     private void setupBasicInfo() {
@@ -120,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
     private View getEducationView(final Education education) {
         View educationView = getLayoutInflater().inflate(R.layout.education_item, null);
+
         String dateString = DateUtils.dateToString(education.startDate)
                 + " ~ " + DateUtils.dateToString(education.endDate);
         ((TextView) educationView.findViewById(R.id.education_school))
@@ -139,6 +180,64 @@ public class MainActivity extends AppCompatActivity {
         return educationView;
     }
 
+    private void setupExperiencesUI() {
+        LinearLayout experiencesLayout = (LinearLayout) findViewById(R.id.experience_list);
+        experiencesLayout.removeAllViews();
+        for (Experience experience : experiences) {
+            experiencesLayout.addView(getExperienceView(experience));
+        }
+    }
+
+    private View getExperienceView(final Experience experience) {
+        View experienceView = getLayoutInflater().inflate(R.layout.experience_item, null);
+
+        String dateString = DateUtils.dateToString(experience.startDate)
+                + " ~ " + DateUtils.dateToString(experience.endDate);
+        ((TextView) experienceView.findViewById(R.id.experience_company))
+                .setText(experience.company + " (" + dateString + ")");
+        ((TextView) experienceView.findViewById(R.id.experience_details))
+                .setText(formatItems(experience.details));
+
+        ImageButton editExperienceBtn = (ImageButton) experienceView.findViewById(R.id.edit_experience_btn);
+        editExperienceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ExperienceEditActivity.class);
+                intent.putExtra(ExperienceEditActivity.KEY_EXPERIENCE, experience);
+                startActivityForResult(intent, REQ_CODE_EDIT_EXPERIENCE);
+            }
+        });
+        return experienceView;
+    }
+
+    private void setupProjectsUI() {
+        LinearLayout projectListLayout = (LinearLayout) findViewById(R.id.project_list);
+        projectListLayout.removeAllViews();
+        for (Project project : projects) {
+            projectListLayout.addView(getProjectView(project));
+        }
+    }
+
+    private View getProjectView(final Project project) {
+        View projectView = getLayoutInflater().inflate(R.layout.project_item, null);
+
+        String dateString = DateUtils.dateToString(project.startDate)
+                + " ~ " + DateUtils.dateToString(project.endDate);
+        ((TextView) projectView.findViewById(R.id.project_name))
+                .setText(project.name + " (" + dateString + ")");
+        ((TextView) projectView.findViewById(R.id.project_details))
+                .setText(formatItems(project.details));
+        projectView.findViewById(R.id.edit_project_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ProjectEditActivity.class);
+                intent.putExtra(ProjectEditActivity.KEY_PROJECT, project);
+                startActivityForResult(intent, REQ_CODE_EDIT_PROJECT);
+            }
+        });
+        return projectView;
+    }
+
     private void loadData() {
         BasicInfo savedBasicInfo = ModelUtils.read(this,
                 MODEL_BASIC_INFO,
@@ -149,6 +248,16 @@ public class MainActivity extends AppCompatActivity {
                 MODEL_EDUCATIONS,
                 new TypeToken<List<Education>>(){});
         educations = savedEducation == null ? new ArrayList<Education>() : savedEducation;
+
+        List<Experience> savedExperience = ModelUtils.read(this,
+                MODEL_EXPERIENCES,
+                new TypeToken<List<Experience>>(){});
+        experiences = savedExperience == null ? new ArrayList<Experience>() : savedExperience;
+
+        List<Project> savedProjects = ModelUtils.read(this,
+                MODEL_PROJECTS,
+                new TypeToken<List<Project>>(){});
+        projects = savedProjects == null ? new ArrayList<Project>() : savedProjects;
     }
 
     public static String formatItems(List<String> items) {
@@ -188,6 +297,45 @@ public class MainActivity extends AppCompatActivity {
         setupEducationsUI();
     }
 
+
+    private void updateExperience(Experience experience) {
+        boolean found = false;
+        for (int i = 0; i < experiences.size(); ++i) {
+            Experience e = experiences.get(i);
+            if (e.id.equals(experience.id)) {
+                found = true;
+                experiences.set(i, experience);
+                break;
+            }
+        }
+
+        if (!found) {
+            experiences.add(experience);
+        }
+
+        ModelUtils.save(this, MODEL_EXPERIENCES, experiences);
+        setupExperiencesUI();
+    }
+
+    private void updateProject(Project project) {
+        boolean found = false;
+        for (int i = 0; i < projects.size(); ++i) {
+            Project p = projects.get(i);
+            if (TextUtils.equals(p.id, project.id)) {
+                found = true;
+                projects.set(i, project);
+                break;
+            }
+        }
+
+        if (!found) {
+            projects.add(project);
+        }
+
+        ModelUtils.save(this, MODEL_PROJECTS, projects);
+        setupProjectsUI();
+    }
+
     private void deleteEducation(@NonNull String educationId) {
         for (int i = 0; i < educations.size(); ++i) {
             Education e = educations.get(i);
@@ -199,5 +347,31 @@ public class MainActivity extends AppCompatActivity {
 
         ModelUtils.save(this, MODEL_EDUCATIONS, educations);
         setupEducationsUI();
+    }
+
+    private void deleteExperience(@NonNull String experienceId) {
+        for (int i = 0; i < experiences.size(); ++i) {
+            Experience e = experiences.get(i);
+            if (TextUtils.equals(e.id, experienceId)) {
+                experiences.remove(i);
+                break;
+            }
+        }
+
+        ModelUtils.save(this, MODEL_EXPERIENCES, experiences);
+        setupExperiencesUI();
+    }
+
+    private void deleteProject(@NonNull String projectId) {
+        for (int i = 0; i < projects.size(); ++i) {
+            Project p = projects.get(i);
+            if (TextUtils.equals(p.id, projectId)) {
+                projects.remove(i);
+                break;
+            }
+        }
+
+        ModelUtils.save(this, MODEL_PROJECTS, projects);
+        setupProjectsUI();
     }
 }
