@@ -13,24 +13,24 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:id="@+id/education_school"
+            android:id="@+id/custom_item_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
 
         <ImageButton
-            android:id="@+id/edit_education_btn"
+            android:id="@+id/edit_custom_btn"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_mode_edit_black_18dp"
             android:alpha="0.7"
             android:background="?attr/selectableItemBackground"
-            android:contentDescription="@string/edit_education"/>
+            android:contentDescription="@string/edit_custom"/>
 
     </LinearLayout>
 
     <TextView
-        android:id="@+id/education_courses"
+        android:id="@+id/custom_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"/>

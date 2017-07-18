@@ -3,14 +3,11 @@ package com.shuzhongchen.ecresume;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.view.View;
+
 import android.widget.EditText;
 
 import com.shuzhongchen.ecresume.model.CustomTitle;
-import com.shuzhongchen.ecresume.model.Education;
 
-import java.util.Arrays;
 
 /**
  * Created by shuzhongchen on 7/18/17.

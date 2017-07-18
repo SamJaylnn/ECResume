@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import com.google.gson.reflect.TypeToken;
 import com.shuzhongchen.ecresume.model.BasicInfo;
+import com.shuzhongchen.ecresume.model.Custom;
 import com.shuzhongchen.ecresume.model.CustomTitle;
 import com.shuzhongchen.ecresume.model.Education;
 import com.shuzhongchen.ecresume.model.Experience;
@@ -32,18 +34,21 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQ_CODE_EDIT_PROJECT = 102;
     private static final int REQ_CODE_EDIT_BASIC_INFO = 103;
     private static final int REQ_CODE_EDIT_CUSTOM_TITLE = 104;
+    private static final int REQ_CODE_EDIT_CUSTOM = 105;
 
     private static final String MODEL_EDUCATIONS = "educations";
     private static final String MODEL_EXPERIENCES = "experiences";
     private static final String MODEL_PROJECTS = "projects";
     private static final String MODEL_BASIC_INFO = "basic_info";
     private static final String MODEL_CUSTOM_TITLE = "custom_title";
+    private static final String MODEL_CUSTOMS = "customs";
 
     private BasicInfo basicInfo;
     private List<Education> educations;
     private List<Experience> experiences;
     private List<Project> projects;
-    private  CustomTitle customTitle;
+    private CustomTitle customTitle;
+    private List<Custom> customs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +97,15 @@ public class MainActivity extends AppCompatActivity {
                     CustomTitle customTitle = data.getParcelableExtra(CustomTitleEditActivity.KEY_CUSTOM_TITLE);
                     updateCustomTitle(customTitle);
                     break;
+                case REQ_CODE_EDIT_CUSTOM:
+                    String customId = data.getStringExtra(CustomEditActivity.KEY_CUSTOM_ID);
+                    if (customId != null) {
+                        deleteCustom(customId);
+                    } else {
+                        Custom custom = data.getParcelableExtra(CustomEditActivity.KEY_CUSTOM);
+                        updateCustom(custom);
+                    }
+                    break;
             }
         }
     }
@@ -126,6 +140,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ImageButton addCustomBtn = (ImageButton) findViewById(R.id.add_custom_btn);
+        addCustomBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CustomEditActivity.class);
+                startActivityForResult(intent, REQ_CODE_EDIT_CUSTOM);
+            }
+        });
 
 
         setupBasicInfo();
@@ -133,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         setupExperiencesUI();
         setupProjectsUI();
         setupCustomTitle();
+        setupCustomsUI();
     }
 
     private void setupBasicInfo() {
@@ -264,6 +287,35 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setupCustomsUI() {
+        LinearLayout customListLayout = (LinearLayout) findViewById(R.id.custom_list);
+        customListLayout.removeAllViews();
+        for (Custom custom : customs) {
+            customListLayout.addView(getCustomView(custom));
+        }
+    }
+
+    private View getCustomView(final Custom custom) {
+        View customView = getLayoutInflater().inflate(R.layout.custom_item, null);
+
+        String dateString = custom.startDate
+                + " ~ " + custom.endDate;
+        ((TextView) customView.findViewById(R.id.custom_item_title))
+                .setText(custom.title + " (" + dateString + ")");
+        ((TextView) customView.findViewById(R.id.custom_details))
+                .setText(formatItems(custom.details));
+
+        customView.findViewById(R.id.edit_custom_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CustomEditActivity.class);
+                intent.putExtra(CustomEditActivity.KEY_CUSTOM, custom);
+                startActivityForResult(intent, REQ_CODE_EDIT_CUSTOM);
+            }
+        });
+        return customView;
+    }
+
     private void loadData() {
         BasicInfo savedBasicInfo = ModelUtils.read(this,
                 MODEL_BASIC_INFO,
@@ -289,6 +341,11 @@ public class MainActivity extends AppCompatActivity {
                 MODEL_CUSTOM_TITLE,
                 new TypeToken<CustomTitle>(){});
         customTitle = savedCustomTitle == null ? new CustomTitle() : savedCustomTitle;
+
+        List<Custom> savedCustoms = ModelUtils.read(this,
+                MODEL_CUSTOMS,
+                new TypeToken<List<Custom>>(){});
+        customs = savedCustoms == null ? new ArrayList<Custom>() : savedCustoms;
     }
 
     public static String formatItems(List<String> items) {
@@ -374,6 +431,25 @@ public class MainActivity extends AppCompatActivity {
         setupCustomTitle();
     }
 
+    private void updateCustom(Custom custom) {
+        boolean found = false;
+        for (int i = 0; i < customs.size(); ++i) {
+            Custom c = customs.get(i);
+            if (TextUtils.equals(c.id, custom.id)) {
+                found = true;
+                customs.set(i, custom);
+                break;
+            }
+        }
+
+        if (!found) {
+            customs.add(custom);
+        }
+
+        ModelUtils.save(this, MODEL_CUSTOMS, customs);
+        setupCustomsUI();
+    }
+
     private void deleteEducation(@NonNull String educationId) {
         for (int i = 0; i < educations.size(); ++i) {
             Education e = educations.get(i);
@@ -411,5 +487,18 @@ public class MainActivity extends AppCompatActivity {
 
         ModelUtils.save(this, MODEL_PROJECTS, projects);
         setupProjectsUI();
+    }
+
+    private void deleteCustom(@NonNull String customId) {
+            for (int i = 0; i < customs.size(); ++i) {
+            Custom c = customs.get(i);
+            if (TextUtils.equals(c.id, customId)) {
+                customs.remove(i);
+                break;
+            }
+        }
+
+        ModelUtils.save(this, MODEL_CUSTOMS, customs);
+        setupCustomsUI();
     }
 }

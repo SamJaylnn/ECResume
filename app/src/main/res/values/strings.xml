@@ -37,6 +37,9 @@
     <string name="save">Save</string>
     <string name="pick_date">Pick date</string>
 
-    <string name="set_own_section">Set your own section</string>
+    <string name="set_own_section">Customized Section</string>
+    <string name="custom_edit_item_title_hint">Title</string>
+    <string name="custom_edit_details_hint">Details</string>
+    <string name="edit_custom">Edit custom</string>
 
 </resources>

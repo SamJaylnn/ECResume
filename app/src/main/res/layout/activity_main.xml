@@ -179,7 +179,7 @@
                 android:id="@+id/edit_custom_title"
                 android:layout_width="@dimen/icon_button_size"
                 android:layout_height="@dimen/icon_button_size"
-                android:layout_marginLeft="@dimen/spacing_xsmall"
+                android:layout_marginRight="@dimen/spacing_xsmall"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/edit_basic_info"
                 android:src="@drawable/ic_mode_edit_black_24dp" />

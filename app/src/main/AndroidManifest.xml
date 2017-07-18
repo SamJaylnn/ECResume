@@ -6,7 +6,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/avator"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -23,6 +23,7 @@
         <activity android:name=".ExperienceEditActivity"/>
         <activity android:name=".ProjectEditActivity"/>
         <activity android:name=".CustomTitleEditActivity"/>
+        <activity android:name=".CustomEditActivity"/>
 
     </application>
 

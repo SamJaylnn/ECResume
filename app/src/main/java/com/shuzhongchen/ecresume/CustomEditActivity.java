@@ -12,20 +12,21 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.shuzhongchen.ecresume.model.Project;
-import com.shuzhongchen.ecresume.util.DateUtils;
+import com.shuzhongchen.ecresume.EditBaseActivity;
+import com.shuzhongchen.ecresume.model.Custom;
+
 
 import java.util.Arrays;
 import java.util.Calendar;
 
 /**
- * Created by shuzhongchen on 7/17/17.
+ * Created by shuzhongchen on 7/18/17.
  */
 
-public class ProjectEditActivity extends EditBaseActivity<Project> {
+public class CustomEditActivity extends EditBaseActivity<Custom> {
 
-    public static final String KEY_PROJECT = "project";
-    public static final String KEY_PROJECT_ID = "project_id";
+    public static final String KEY_CUSTOM = "custom";
+    public static final String KEY_CUSTOM_ID = "custom_id";
 
     private ImageButton btnChangeStartDate;
     private ImageButton btnChangeEndDate;
@@ -39,38 +40,38 @@ public class ProjectEditActivity extends EditBaseActivity<Project> {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.activity_project_edit;
+        return R.layout.activity_custom_edit;
     }
 
     @Override
     protected void setupUIForCreate() {
-        setTitle("Edit Project");
+        setTitle("Edit Customized Section");
 
         setupDatePicker();
 
-        findViewById(R.id.project_edit_delete).setVisibility(View.GONE);
+        findViewById(R.id.custom_edit_delete).setVisibility(View.GONE);
     }
 
     @Override
-    protected void setupUIForEdit(@NonNull final Project data) {
-        setTitle("New Project");
+    protected void setupUIForEdit(@NonNull final Custom data) {
+        setTitle("New Customized Section");
 
         setupDatePicker();
 
-        ((EditText) findViewById(R.id.project_edit_name))
-                .setText(data.name);
-        ((EditText) findViewById(R.id.project_edit_start_date))
+        ((EditText) findViewById(R.id.custom_edit_main_title))
+                .setText(data.title);
+        ((EditText) findViewById(R.id.custom_edit_start_date))
                 .setText(data.startDate);
-        ((EditText) findViewById(R.id.project_edit_end_date))
+        ((EditText) findViewById(R.id.custom_edit_end_date))
                 .setText(data.endDate);
-        ((EditText) findViewById(R.id.project_edit_details))
+        ((EditText) findViewById(R.id.custom_edit_details))
                 .setText(TextUtils.join("\n", data.details));
 
-        findViewById(R.id.project_edit_delete).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.custom_edit_delete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent resultIntent = new Intent();
-                resultIntent.putExtra(KEY_PROJECT_ID, data.id);
+                resultIntent.putExtra(KEY_CUSTOM_ID, data.id);
                 setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             }
@@ -78,25 +79,26 @@ public class ProjectEditActivity extends EditBaseActivity<Project> {
     }
 
     @Override
-    protected void saveAndExit(@Nullable Project data) {
+    protected void saveAndExit(@Nullable Custom data) {
         if (data == null) {
-            data = new Project();
+            data = new Custom();
         }
 
-        data.name = ((EditText) findViewById(R.id.project_edit_name)).getText().toString();
-        data.startDate = ((EditText) findViewById(R.id.project_edit_start_date)).getText().toString();
-        data.endDate = ((EditText) findViewById(R.id.project_edit_end_date)).getText().toString();
-        data.details = Arrays.asList(TextUtils.split(((EditText) findViewById(R.id.project_edit_details)).getText().toString(), "\n"));
+        data.title = ((EditText) findViewById(R.id.custom_edit_main_title)).getText().toString();
+        data.startDate = ((EditText) findViewById(R.id.custom_edit_start_date)).getText().toString();
+        data.endDate = ((EditText) findViewById(R.id.custom_edit_end_date)).getText().toString();
+        data.details = Arrays.asList(TextUtils.split(((EditText) findViewById(R.id.custom_edit_details)).getText().toString(), "\n"));
 
         Intent resultIntent = new Intent();
-        resultIntent.putExtra(KEY_PROJECT, data);
+        resultIntent.putExtra(KEY_CUSTOM, data);
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
+
     }
 
     @Override
-    protected Project initializeData() {
-        return getIntent().getParcelableExtra(KEY_PROJECT);
+    protected Custom initializeData() {
+        return getIntent().getParcelableExtra(KEY_CUSTOM);
     }
 
     // date picker
@@ -150,7 +152,7 @@ public class ProjectEditActivity extends EditBaseActivity<Project> {
             day = selectedDay;
 
             // set selected date into EditText
-            ((EditText) findViewById(R.id.project_edit_start_date))
+            ((EditText) findViewById(R.id.custom_edit_start_date))
                     .setText(new StringBuilder()
                             // Month is 0 based, just add 1
                             .append(month + 1).append("/").append(day).append("/")
@@ -169,7 +171,7 @@ public class ProjectEditActivity extends EditBaseActivity<Project> {
             day = selectedDay;
 
             // set selected date into EditText
-            ((EditText) findViewById(R.id.project_edit_end_date))
+            ((EditText) findViewById(R.id.custom_edit_end_date))
                     .setText(new StringBuilder()
                             // Month is 0 based, just add 1
                             .append(month + 1).append("/").append(day).append("/")
