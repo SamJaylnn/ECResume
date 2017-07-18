@@ -35,5 +35,8 @@
     <string name="project_edit_details_hint">Details</string>
     <string name="edit_basic_info">Edit Basic Info</string>
     <string name="save">Save</string>
+    <string name="pick_date">Pick date</string>
+
+    <string name="set_own_section">Set your own section</string>
 
 </resources>

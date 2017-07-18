@@ -17,9 +17,9 @@ public class Project implements Parcelable{
 
     public String name;
 
-    public Date startDate;
+    public String startDate;
 
-    public Date endDate;
+    public String endDate;
 
     public List<String> details;
 
@@ -30,8 +30,8 @@ public class Project implements Parcelable{
     protected Project(Parcel in) {
         id = in.readString();
         name = in.readString();
-        startDate = new Date(in.readLong());
-        endDate = new Date(in.readLong());
+        startDate = in.readString();
+        endDate = in.readString();
         details = in.createStringArrayList();
     }
 
@@ -56,8 +56,8 @@ public class Project implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(name);
-        dest.writeLong(startDate.getTime());
-        dest.writeLong(endDate.getTime());
+        dest.writeString(startDate);
+        dest.writeString(endDate);
         dest.writeStringList(details);
     }
 }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.gson.reflect.TypeToken;
 import com.shuzhongchen.ecresume.model.BasicInfo;
+import com.shuzhongchen.ecresume.model.CustomTitle;
 import com.shuzhongchen.ecresume.model.Education;
 import com.shuzhongchen.ecresume.model.Experience;
 import com.shuzhongchen.ecresume.model.Project;
@@ -30,16 +31,19 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQ_CODE_EDIT_EXPERIENCE = 101;
     private static final int REQ_CODE_EDIT_PROJECT = 102;
     private static final int REQ_CODE_EDIT_BASIC_INFO = 103;
+    private static final int REQ_CODE_EDIT_CUSTOM_TITLE = 104;
 
     private static final String MODEL_EDUCATIONS = "educations";
     private static final String MODEL_EXPERIENCES = "experiences";
     private static final String MODEL_PROJECTS = "projects";
     private static final String MODEL_BASIC_INFO = "basic_info";
+    private static final String MODEL_CUSTOM_TITLE = "custom_title";
 
     private BasicInfo basicInfo;
     private List<Education> educations;
     private List<Experience> experiences;
     private List<Project> projects;
+    private  CustomTitle customTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
                         updateProject(project);
                     }
                     break;
+                case REQ_CODE_EDIT_CUSTOM_TITLE:
+                    CustomTitle customTitle = data.getParcelableExtra(CustomTitleEditActivity.KEY_CUSTOM_TITLE);
+                    updateCustomTitle(customTitle);
+                    break;
             }
         }
     }
@@ -118,10 +126,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         setupBasicInfo();
         setupEducationsUI();
         setupExperiencesUI();
         setupProjectsUI();
+        setupCustomTitle();
     }
 
     private void setupBasicInfo() {
@@ -161,8 +172,8 @@ public class MainActivity extends AppCompatActivity {
     private View getEducationView(final Education education) {
         View educationView = getLayoutInflater().inflate(R.layout.education_item, null);
 
-        String dateString = DateUtils.dateToString(education.startDate)
-                + " ~ " + DateUtils.dateToString(education.endDate);
+        String dateString = education.startDate
+                + " ~ " + education.endDate;
         ((TextView) educationView.findViewById(R.id.education_school))
                 .setText(education.school + " " + education.major + " (" + dateString + ")");
         ((TextView) educationView.findViewById(R.id.education_courses))
@@ -191,8 +202,8 @@ public class MainActivity extends AppCompatActivity {
     private View getExperienceView(final Experience experience) {
         View experienceView = getLayoutInflater().inflate(R.layout.experience_item, null);
 
-        String dateString = DateUtils.dateToString(experience.startDate)
-                + " ~ " + DateUtils.dateToString(experience.endDate);
+        String dateString = experience.startDate
+                + " ~ " + experience.endDate;
         ((TextView) experienceView.findViewById(R.id.experience_company))
                 .setText(experience.company + " (" + dateString + ")");
         ((TextView) experienceView.findViewById(R.id.experience_details))
@@ -221,8 +232,8 @@ public class MainActivity extends AppCompatActivity {
     private View getProjectView(final Project project) {
         View projectView = getLayoutInflater().inflate(R.layout.project_item, null);
 
-        String dateString = DateUtils.dateToString(project.startDate)
-                + " ~ " + DateUtils.dateToString(project.endDate);
+        String dateString = project.startDate
+                + " ~ " + project.endDate;
         ((TextView) projectView.findViewById(R.id.project_name))
                 .setText(project.name + " (" + dateString + ")");
         ((TextView) projectView.findViewById(R.id.project_details))
@@ -236,6 +247,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         return projectView;
+    }
+
+    private void setupCustomTitle() {
+        ((TextView) findViewById(R.id.customTitle)).setText(TextUtils.isEmpty(customTitle.title)
+                ? "Set your own section"
+                : customTitle.title);
+
+        findViewById(R.id.edit_custom_title).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CustomTitleEditActivity.class);
+                intent.putExtra(CustomTitleEditActivity.KEY_CUSTOM_TITLE, customTitle);
+                startActivityForResult(intent, REQ_CODE_EDIT_CUSTOM_TITLE);
+            }
+        });
     }
 
     private void loadData() {
@@ -258,6 +284,11 @@ public class MainActivity extends AppCompatActivity {
                 MODEL_PROJECTS,
                 new TypeToken<List<Project>>(){});
         projects = savedProjects == null ? new ArrayList<Project>() : savedProjects;
+
+        CustomTitle savedCustomTitle = ModelUtils.read(this,
+                MODEL_CUSTOM_TITLE,
+                new TypeToken<CustomTitle>(){});
+        customTitle = savedCustomTitle == null ? new CustomTitle() : savedCustomTitle;
     }
 
     public static String formatItems(List<String> items) {
@@ -334,6 +365,13 @@ public class MainActivity extends AppCompatActivity {
 
         ModelUtils.save(this, MODEL_PROJECTS, projects);
         setupProjectsUI();
+    }
+
+    private void updateCustomTitle(CustomTitle customTitle) {
+        ModelUtils.save(this, MODEL_CUSTOM_TITLE, customTitle);
+
+        this.customTitle = customTitle;
+        setupCustomTitle();
     }
 
     private void deleteEducation(@NonNull String educationId) {

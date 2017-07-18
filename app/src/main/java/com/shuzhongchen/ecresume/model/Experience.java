@@ -19,9 +19,9 @@ public class Experience implements Parcelable{
 
     public String title;
 
-    public Date startDate;
+    public String startDate;
 
-    public Date endDate;
+    public String endDate;
 
     public List<String> details;
 
@@ -33,8 +33,8 @@ public class Experience implements Parcelable{
         id = in.readString();
         company = in.readString();
         title = in.readString();
-        startDate = new Date(in.readLong());
-        endDate = new Date(in.readLong());
+        startDate = in.readString();
+        endDate = in.readString();
         details = in.createStringArrayList();
     }
 
@@ -60,8 +60,8 @@ public class Experience implements Parcelable{
         dest.writeString(id);
         dest.writeString(company);
         dest.writeString(title);
-        dest.writeLong(startDate.getTime());
-        dest.writeLong(endDate.getTime());
+        dest.writeString(startDate);
+        dest.writeString(endDate);
         dest.writeStringList(details);
     }
 }

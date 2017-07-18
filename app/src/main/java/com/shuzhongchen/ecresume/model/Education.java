@@ -21,9 +21,9 @@ public class Education implements Parcelable{
 
     public String major;
 
-    public Date startDate;
+    public String startDate;
 
-    public Date endDate;
+    public String endDate;
 
     public List<String> courses;
 
@@ -33,8 +33,8 @@ public class Education implements Parcelable{
         id = in.readString();
         school = in.readString();
         major = in.readString();
-        startDate = DateUtils.stringToDate(in.readString());
-        endDate = DateUtils.stringToDate(in.readString());
+        startDate = in.readString();
+        endDate = in.readString();
         courses = in.createStringArrayList();
     }
 
@@ -60,8 +60,8 @@ public class Education implements Parcelable{
         parcel.writeString(id);
         parcel.writeString(school);
         parcel.writeString(major);
-        parcel.writeString(DateUtils.dateToString(startDate));
-        parcel.writeString(DateUtils.dateToString(endDate));
+        parcel.writeString(startDate);
+        parcel.writeString(endDate);
         parcel.writeStringList(courses);
     }
 }
