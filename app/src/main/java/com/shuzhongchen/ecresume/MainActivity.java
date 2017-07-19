@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
         String dateString = experience.startDate
                 + " ~ " + experience.endDate;
         ((TextView) experienceView.findViewById(R.id.experience_company))
-                .setText(experience.company + " (" + dateString + ")");
+                .setText(experience.company + " " + experience.title + " (" + dateString + ")");
         ((TextView) experienceView.findViewById(R.id.experience_details))
                 .setText(formatItems(experience.details));
 
