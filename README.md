@@ -2,6 +2,13 @@
 
 ECResume is an Android app provides resume edit service where users can build their own professional resumes.
 
+## Technology
+
+* Used LinearLayout and layout nesting to build main UI. 
+* Used Action Bar and separated Activity to implement Form UI, resume can be edited through Form UI. 
+* Used Parcelable to implement serialize and deserialize, which enabled data transmission between Activities.
+* Stored application data locally on Android mobile phone by using SharedPreferences.
+
 ## Features
 
 * Edit and delete user information
